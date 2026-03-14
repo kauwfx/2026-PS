@@ -1,9 +1,7 @@
 catalogo = [
-    {"titulo": "Turma da Mônica: Laços", "autor": "Vitor Cafaggi e Lu Cafaggi", "disponivel": True},
-    {"titulo": "Turma da Mônica: Lições", "autor": "Vitor Cafaggi e Lu Cafaggi", "disponivel": True},
-    {"titulo": "Astronauta: Magnetar", "autor": "Danilo Beyruth", "disponivel": False},
-    {"titulo": "Jeremias: Pele", "autor": "Rafael Calça e Jefferson Costa", "disponivel": True},
-    {"titulo": "Bidú: Caminhos", "autor": "Eduardo Damasceno e Luís Felipe Garrocho", "disponivel": True},
+    {"titulo": "Código Limpo", "autor": "Robert C. Martin", "disponivel": True},
+    {"titulo": "Entendendo Algoritmos", "autor": "Aditya Bhargava", "disponivel": False},
+    {"titulo": "Python Fluente", "autor": "Luciano Ramalho", "disponivel": True},
 ]
 
 print("Primeiro livro:", catalogo[0]["titulo"])
