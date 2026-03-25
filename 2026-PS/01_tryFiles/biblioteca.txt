@@ -1,0 +1,60 @@
+ARQUIVO = "biblioteca.txt"
+SEPARADOR = "|"  # usado pra separar os dados dentro do arquivo
+
+
+def carregar_catalogo():
+    """
+    Lê o arquivo .txt e transforma cada linha em um dicionário.
+    Retorna uma lista com todos os livros.
+    """
+    catalogo = []
+
+    try:
+        # Abre o arquivo para leitura
+        with open(ARQUIVO, "r", encoding="utf-8") as f:
+            for linha in f:
+                linha = linha.strip()
+
+                # Ignora linhas vazias
+                if not linha:
+                    continue
+
+                partes = linha.split(SEPARADOR)
+
+                # Se a linha estiver errada, pula ela
+                if len(partes) != 3:
+                    continue
+
+                titulo, autor, disponivel_str = partes
+
+                # Converte "True"/"False" (texto) para True/False (booleano)
+                catalogo.append({
+                    "titulo": titulo,
+                    "autor": autor,
+                    "disponivel": disponivel_str == "True"
+                })
+
+    except FileNotFoundError:
+        # Se o arquivo ainda não existir, retorna lista vazia
+        pass
+
+    return catalogo
+
+
+def salvar_catalogo(catalogo):
+    """
+    Salva todos os livros da lista no arquivo .txt.
+    Sobrescreve o arquivo inteiro.
+    """
+    try:
+        # Abre o arquivo para escrita (cria se não existir)
+        with open(ARQUIVO, "w", encoding="utf-8") as f:
+            for livro in catalogo:
+                linha = f"{livro['titulo']}{SEPARADOR}{livro['autor']}{SEPARADOR}{livro['disponivel']}\n"
+                f.write(linha)
+
+        print(f"Catálogo salvo em '{ARQUIVO}'.")
+
+    except IOError as e:
+        # Caso dê erro (ex: sem permissão ou disco cheio)
+        print(f"Erro ao salvar: {e}")
