@@ -1,0 +1,46 @@
+[
+    {
+        "nome": "luiz carlos",
+        "nascimento": 130.0,
+        "especie": "kaue",
+        "idade": true,
+        "peso": 2010,
+        "nome_dono": 180,
+        "vacinado": "cachorro",
+        "hospedado": 16,
+        "altura": false
+    },
+    {
+        "nome": "kaue",
+        "nascimento": 23,
+        "especie": 1320.0,
+        "idade": "otavio",
+        "peso": false,
+        "nome_dono": 2010,
+        "vacinado": "180",
+        "hospedado": "cahorro",
+        "altura": false
+    },
+    {
+        "nome": "ksks",
+        "nascimento": "skks",
+        "especie": 12,
+        "idade": 20.0,
+        "peso": "kaue",
+        "nome_dono": false,
+        "vacinado": 2010,
+        "hospedado": "160",
+        "altura": false
+    },
+    {
+        "nome": "kaue",
+        "nascimento": "2010",
+        "especie": "cachorro",
+        "idade": 13,
+        "peso": 20.0,
+        "nome_dono": "kaue",
+        "vacinado": true,
+        "hospedado": false,
+        "altura": "1,80"
+    }
+]
