@@ -2,9 +2,11 @@ import java.util.ArrayList;
 import java.util.Scanner;
 
 /**
- * Projeto Secretaria - Classe Main
- * Autor: Kauê
- * Data: 2026.08.27
+ * Disciplina: 2026-PS
+ * Estudante : Kaue
+ * Data      : 2026.08.27
+ * Projeto   : aula32-projeto-secretaria
+ * Arquivo   : Main.java
  */
 public class Main {
 
@@ -14,7 +16,7 @@ public class Main {
 
         while (true) {
             System.out.println("\n==========================================");
-            System.out.println("   SECRETARIA DO CAMPUS - por Kauê");
+            System.out.println("   SECRETARIA DO IFPR GERAL - Kauê");
             System.out.println("==========================================");
             System.out.println("[1] Cadastrar aluno");
             System.out.println("[2] Listar alunos");
@@ -22,11 +24,11 @@ public class Main {
             System.out.println("[4] Atualizar curso");
             System.out.println("[5] Remover aluno");
             System.out.println("[6] Relatorio");
-            System.out.println("[7] Buscar por nome"); // Melhoria (a) para Conceito A
+            System.out.println("[7] Buscar por nome");
             System.out.println("[0] Sair");
             System.out.print("Sua escolha: ");
 
-            String opcao = teclado.nextLine();
+            String opcao = teclado.nextLine().trim();
 
             if (opcao.equals("0")) {
                 System.out.println("Secretaria fechada. Ate a proxima!");
@@ -52,8 +54,6 @@ public class Main {
         teclado.close();
     }
 
-    // --- MÉTODOS AUXILIARES ---
-
     public static Aluno buscarPorMatricula(ArrayList<Aluno> lista, String matricula) {
         for (int i = 0; i < lista.size(); i++) {
             Aluno a = lista.get(i);
@@ -64,44 +64,44 @@ public class Main {
         return null;
     }
 
-    // --- MÉTODOS DO MENU ---
-
     public static void cadastrar(Scanner teclado, ArrayList<Aluno> lista) {
+        System.out.print("Nome: ");
+        String nome = teclado.nextLine().trim();
+
         System.out.print("Matricula: ");
-        String matricula = teclado.nextLine();
+        String matricula = teclado.nextLine().trim();
 
         if (buscarPorMatricula(lista, matricula) != null) {
             System.out.println("Ja existe ficha com a matricula " + matricula + "!");
             return;
         }
 
-        System.out.print("Nome: ");
-        String nome = teclado.nextLine();
         System.out.print("Curso: ");
-        String curso = teclado.nextLine();
+        String curso = teclado.nextLine().trim();
+
         System.out.print("Cidade: ");
-        String cidade = teclado.nextLine();
+        String cidade = teclado.nextLine().trim();
 
         Aluno novo = new Aluno(nome, matricula, curso, cidade);
         lista.add(novo);
-        System.out.println("Ficha de " + nome + " arquivada!");
+        System.out.println("Ficha de " + novo.getNome() + " arquivada!");
     }
 
     public static void listar(ArrayList<Aluno> lista) {
-        if (lista.isEmpty()) {
-            System.out.println("Gaveteiro vazio.");
+        if (lista.size() == 0) {
+            System.out.println("Nenhuma ficha no gaveteiro ainda.");
             return;
         }
         System.out.println("--- FICHAS NO GAVETEIRO: " + lista.size() + " ---");
         for (int i = 0; i < lista.size(); i++) {
             Aluno a = lista.get(i);
-            System.out.println(a); // Chama toString() implicitamente
+            System.out.println(a);
         }
     }
 
     public static void buscar(Scanner teclado, ArrayList<Aluno> lista) {
         System.out.print("Matricula procurada: ");
-        String matricula = teclado.nextLine();
+        String matricula = teclado.nextLine().trim();
 
         Aluno a = buscarPorMatricula(lista, matricula);
 
@@ -115,7 +115,7 @@ public class Main {
 
     public static void atualizar(Scanner teclado, ArrayList<Aluno> lista) {
         System.out.print("Matricula da ficha a atualizar: ");
-        String matricula = teclado.nextLine();
+        String matricula = teclado.nextLine().trim();
 
         Aluno a = buscarPorMatricula(lista, matricula);
 
@@ -125,7 +125,7 @@ public class Main {
         }
 
         System.out.print("Novo curso de " + a.getNome() + ": ");
-        String novoCurso = teclado.nextLine();
+        String novoCurso = teclado.nextLine().trim();
         a.setCurso(novoCurso);
 
         System.out.println("Ficha atualizada: " + a);
@@ -133,7 +133,7 @@ public class Main {
 
     public static void remover(Scanner teclado, ArrayList<Aluno> lista) {
         System.out.print("Matricula da ficha a remover: ");
-        String matricula = teclado.nextLine();
+        String matricula = teclado.nextLine().trim();
 
         Aluno a = buscarPorMatricula(lista, matricula);
 
@@ -143,9 +143,9 @@ public class Main {
         }
 
         System.out.print("Tem certeza que remove " + a.getNome() + "? (s/n): ");
-        String resposta = teclado.nextLine();
+        String resposta = teclado.nextLine().trim();
 
-        if (resposta.equalsIgnoreCase("s")) {
+        if (resposta.equals("s")) {
             lista.remove(a);
             System.out.println("Ficha removida.");
         } else {
@@ -158,24 +158,21 @@ public class Main {
         System.out.println("Total de fichas: " + lista.size());
 
         System.out.print("Contar alunos de qual curso? ");
-        String cursoProcurado = teclado.nextLine();
+        String cursoProcurado = teclado.nextLine().trim();
 
-        // preparar -> percorrer -> usar
-        int contador = 0; // preparar
-        for (int i = 0; i < lista.size(); i++) { // percorrer
+        int contador = 0;
+        for (int i = 0; i < lista.size(); i++) {
             if (lista.get(i).getCurso().equalsIgnoreCase(cursoProcurado)) {
                 contador++;
             }
         }
 
-        // usar
         System.out.println("Alunos de " + cursoProcurado + ": " + contador);
     }
 
-    // Melhoria (a): Busca por Nome
     public static void buscarPorNomeMenu(Scanner teclado, ArrayList<Aluno> lista) {
         System.out.print("Nome procurado: ");
-        String nomeProcurado = teclado.nextLine();
+        String nomeProcurado = teclado.nextLine().trim();
 
         boolean encontrou = false;
         for (int i = 0; i < lista.size(); i++) {
