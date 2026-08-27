@@ -18,7 +18,7 @@ public class Main {
 
         while (true) {
             System.out.println("\n==========================================");
-            System.out.println("   SECRETARIA DO IFPR GERAL - Kauê");
+            System.out.println("   SECRETARIA DO CAMPUS - KAUE");
             System.out.println("==========================================");
             System.out.println("[1] Cadastrar aluno");
             System.out.println("[2] Listar alunos");
