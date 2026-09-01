@@ -24,60 +24,109 @@ public class Main {
             teclado.nextLine();
 
             if (opcao == 1) {
-
-                System.out.print("Código: ");
-                int codigo = teclado.nextInt();
-                teclado.nextLine();
-
-                System.out.print("Nome: ");
-                String nome = teclado.nextLine();
-
-                System.out.print("Preço: ");
-                double preco = teclado.nextDouble();
-
-                Produto p = new Produto(codigo, nome, preco);
-                produtos.add(p);
+                cadastrar();
 
             } else if (opcao == 2) {
-
-                for (Produto p : produtos) {
-                    System.out.println(
-                        p.codigo + " - " +
-                        p.nome + " - R$ " +
-                        p.preco
-                    );
-                }
+                listar();
 
             } else if (opcao == 3) {
-
-                System.out.print("Código: ");
-                int codigo = teclado.nextInt();
-
-                for (Produto p : produtos) {
-
-                    if (p.codigo == codigo) {
-
-                        System.out.print("Novo preço: ");
-                        double preco = teclado.nextDouble();
-
-                        p.preco = preco;
-                    }
-                }
+                alterarPreco();
 
             } else if (opcao == 4) {
+                remover();
 
-                System.out.print("Código: ");
-                int codigo = teclado.nextInt();
+            } else if (opcao == 5) {
+                System.out.println("Sistema encerrado.");
 
-                for (Produto p : produtos) {
+            } else {
+                System.out.println("Opção inválida.");
+            }
+        }
+    }
 
-                    if (p.codigo == codigo) {
-                        produtos.remove(p);
-                    }
-                }
+    static void cadastrar() {
+
+        System.out.print("Código: ");
+        int codigo = teclado.nextInt();
+        teclado.nextLine();
+
+        if (buscarPorCodigo(codigo) != null) {
+            System.out.println("Já existe um produto com esse código.");
+            return;
+        }
+
+        System.out.print("Nome: ");
+        String nome = teclado.nextLine();
+
+        System.out.print("Preço: ");
+        double preco = teclado.nextDouble();
+
+        Produto p = new Produto(codigo, nome, preco);
+        produtos.add(p);
+
+        System.out.println("Produto cadastrado com sucesso.");
+    }
+
+    static void listar() {
+
+        if (produtos.isEmpty()) {
+            System.out.println("Nenhum produto cadastrado.");
+            return;
+        }
+
+        System.out.println("\n=== PRODUTOS CADASTRADOS ===");
+
+        for (Produto p : produtos) {
+            System.out.println(p);
+        }
+    }
+
+    static Produto buscarPorCodigo(int codigo) {
+
+        for (Produto p : produtos) {
+
+            if (p.getCodigo() == codigo) {
+                return p;
             }
         }
 
-        System.out.println("Sistema encerrado.");
+        return null;
+    }
+
+    static void alterarPreco() {
+
+        System.out.print("Código: ");
+        int codigo = teclado.nextInt();
+
+        Produto produto = buscarPorCodigo(codigo);
+
+        if (produto == null) {
+            System.out.println("Produto não encontrado.");
+            return;
+        }
+
+        System.out.print("Novo preço: ");
+        double preco = teclado.nextDouble();
+
+        produto.alterarPreco(preco);
+
+        System.out.println("Preço alterado com sucesso.");
+    }
+
+    static void remover() {
+
+        System.out.print("Código: ");
+        int codigo = teclado.nextInt();
+
+        Produto produto = buscarPorCodigo(codigo);
+
+        if (produto == null) {
+            System.out.println("Produto não encontrado.");
+            return;
+        }
+
+        produtos.remove(produto);
+
+        System.out.println("Produto removido com sucesso.");
     }
 }
