@@ -42,6 +42,8 @@ public class Main {
                 System.out.println("Opção inválida.");
             }
         }
+
+        teclado.close();
     }
 
     static void cadastrar() {
@@ -50,6 +52,7 @@ public class Main {
         int codigo = teclado.nextInt();
         teclado.nextLine();
 
+        // Verifica se já existe um produto com o mesmo código
         if (buscarPorCodigo(codigo) != null) {
             System.out.println("Já existe um produto com esse código.");
             return;

@@ -1,5 +1,6 @@
 public class Produto {
 
+    // Atributos privados: encapsulamento
     private int codigo;
     private String nome;
     private double preco;
@@ -10,6 +11,7 @@ public class Produto {
         this.preco = preco;
     }
 
+    // Getter e setter do código
     public int getCodigo() {
         return codigo;
     }
@@ -18,6 +20,7 @@ public class Produto {
         this.codigo = codigo;
     }
 
+    // Getter e setter do nome
     public String getNome() {
         return nome;
     }
@@ -26,6 +29,7 @@ public class Produto {
         this.nome = nome;
     }
 
+    // Getter e setter do preço
     public double getPreco() {
         return preco;
     }
@@ -34,16 +38,20 @@ public class Produto {
         this.preco = preco;
     }
 
+    // Altera o preço normalmente
     public void alterarPreco(double preco) {
         this.preco = preco;
     }
 
+    // Sobrecarga: altera o preço aplicando desconto
     public void alterarPreco(double preco, double desconto) {
         this.preco = preco - (preco * desconto / 100);
     }
 
+    // Representação do produto
     @Override
     public String toString() {
-        return codigo + " - " + nome + " - R$ " + String.format("%.2f", preco);
+        return codigo + " - " + nome + " - R$ "
+                + String.format("%.2f", preco);
     }
 }
