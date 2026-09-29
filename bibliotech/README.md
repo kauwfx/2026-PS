@@ -46,3 +46,5 @@ Hoje, a biblioteca do campus controla os empréstimos em um caderno. Isso gera e
 ### Classes
 
 ![Diagrama de classes do BiblioTech](docs/classes.svg)
+## 5. O que o código devolveu ao diagrama (Aula 37)
+- **Livro** ganhou o atributo `disponivel: boolean`, porque `estaDisponivel()` precisava dele.- **Leitor** ganhou `livrosEmMaos: int`, porque `podePegarEmprestado()` compara com o limite.
