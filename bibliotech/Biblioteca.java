@@ -72,7 +72,9 @@ public class Biblioteca {
         for (int i = 0; i < emprestimos.size(); i++) {
             Emprestimo e = emprestimos.get(i);
 
-            if (e.estaAtivo() && e.getLivro().getTitulo().equals(titulo)) {
+            if (e.estaAtivo()
+                && e.getLivro().getTitulo().equals(titulo)) {
+
                 return e.registrarDevolucao();
             }
         }
@@ -84,5 +86,19 @@ public class Biblioteca {
         for (int i = 0; i < emprestimos.size(); i++) {
             System.out.println(emprestimos.get(i));
         }
+    }
+
+    public String obterAcervoComoTexto() {
+        if (livros.isEmpty()) {
+            return "Nenhum livro cadastrado.";
+        }
+
+        String texto = "";
+
+        for (int i = 0; i < livros.size(); i++) {
+            texto = texto + livros.get(i) + "\n";
+        }
+
+        return texto;
     }
 }
