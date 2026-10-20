@@ -16,6 +16,7 @@ public class TesteEmprestimo {
             + primeiro.realizarEmprestimo()
         );
         System.out.println(primeiro);
+
         System.out.println(
             "Livro disponivel? " + livro.estaDisponivel()
         );
