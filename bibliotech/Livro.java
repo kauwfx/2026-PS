@@ -3,25 +3,42 @@
  * Projeto   : bibliotech
  * Arquivo   : Livro.java
  * Autor     : Kauê
- * Descricao : a caixa "Livro" do diagrama de classes, em Java (Aula 37).
+ * Descricao : Classe modelo do Livro com mapeamento para banco de dados.
  */
 public class Livro {
 
-    // ATRIBUTOS: a faixa do meio da caixa, um por linha, todos private.
+    private int id;
     private String titulo;
     private String autor;
     private int ano;
-    private boolean disponivel;  // nao estava na caixa: o codigo pediu
+    private boolean disponivel;
 
-    // CONSTRUTOR: preenche a ficha do livro no momento do "new".
+    // Construtor original
     public Livro(String titulo, String autor, int ano) {
         this.titulo = titulo;
         this.autor = autor;
         this.ano = ano;
-        this.disponivel = true; // Todo livro nasce disponivel na estante
+        this.disponivel = true;
     }
 
-    // GETTERS: as janelas de leitura.
+    // Construtor para registros do MariaDB (com ID)
+    public Livro(int id, String titulo, String autor, int ano) {
+        this.id = id;
+        this.titulo = titulo;
+        this.autor = autor;
+        this.ano = ano;
+        this.disponivel = true;
+    }
+
+    // Getters e Setters
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
     public String getTitulo() {
         return titulo;
     }
@@ -34,12 +51,10 @@ public class Livro {
         return ano;
     }
 
-    // OPERACAO DA CAIXA: estaDisponivel(), a faixa de baixo do diagrama.
     public boolean estaDisponivel() {
         return disponivel;
     }
 
-    // OPERACOES QUE MUDAM O ATRIBUTO
     public void emprestar() {
         this.disponivel = false;
     }
@@ -48,10 +63,10 @@ public class Livro {
         this.disponivel = true;
     }
 
-    // TOSTRING: apresenta a ficha do livro
     @Override
     public String toString() {
         String status = this.disponivel ? "disponivel" : "emprestado";
-        return this.titulo + " (" + this.autor + ", " + this.ano + ") - " + status;
+        return (this.id > 0 ? this.id + " - " : "") + 
+               this.titulo + " (" + this.autor + ", " + this.ano + ") - " + status;
     }
 }
