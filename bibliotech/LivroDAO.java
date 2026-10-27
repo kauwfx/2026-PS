@@ -2,7 +2,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -101,7 +100,6 @@ public class LivroDAO {
         }
     }
 
-    // === NOVO MÉTODOS DESTA AULA (FASE 3) ===
     public List<String> listarLivros() {
 
         List<String> livros = new ArrayList<>();
@@ -145,5 +143,52 @@ public class LivroDAO {
         }
 
         return livros;
+    }
+
+    // === MÉTODO DA FASE 4 ===
+    public String buscarLivroPorId(int id) {
+
+        String sql =
+            "SELECT id, titulo, autor, ano " +
+            "FROM livros WHERE id = ?";
+
+        try (Connection conexao = Conexao.conectar();
+             PreparedStatement comando =
+                 conexao.prepareStatement(sql)) {
+
+            comando.setInt(1, id);
+
+            try (ResultSet resultado =
+                     comando.executeQuery()) {
+
+                if (resultado.next()) {
+
+                    int codigo =
+                        resultado.getInt("id");
+
+                    String titulo =
+                        resultado.getString("titulo");
+
+                    String autor =
+                        resultado.getString("autor");
+
+                    int ano =
+                        resultado.getInt("ano");
+
+                    return codigo + " - " +
+                           titulo + " - " +
+                           autor + " (" + ano + ")";
+                }
+            }
+
+        } catch (SQLException e) {
+
+            System.out.println(
+                "Erro ao buscar livro: " +
+                e.getMessage()
+            );
+        }
+
+        return null;
     }
 }
