@@ -10,13 +10,16 @@ public class TelaLivros extends JFrame {
     private final DefaultTableModel modelo;
     private final JTable tabela;
 
-    private final JTextField campoId = new JTextField(8);
+    // Campos de texto para ID e Título
+    private final JTextField campoId = new JTextField(5);
+    private final JTextField campoTitulo = new JTextField(12);
+
     private final JLabel status = new JLabel("Pronto.");
 
     public TelaLivros() {
 
         setTitle("BiblioTech - Consulta de Livros");
-        setSize(850, 450);
+        setSize(950, 480);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLayout(new BorderLayout(8, 8));
@@ -35,37 +38,50 @@ public class TelaLivros extends JFrame {
 
         add(new JScrollPane(tabela), BorderLayout.CENTER);
 
-        JPanel controles = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        // Painel superior com os controles de busca por ID e por Título
+        JPanel controles = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 8));
 
+        JButton buscarId = new JButton("Buscar por ID");
+        JButton buscarTitulo = new JButton("Buscar por título");
         JButton atualizar = new JButton("Atualizar listagem");
-        JButton buscar = new JButton("Buscar por ID");
         JButton mostrarTodos = new JButton("Mostrar todos");
-        
-        // Desafio 3: Botão Limpar
         JButton limpar = new JButton("Limpar");
 
-        controles.add(new JLabel("ID do livro:"));
+        // Área de busca por ID
+        controles.add(new JLabel("ID:"));
         controles.add(campoId);
-        controles.add(buscar);
-        controles.add(limpar); // Adicionado à barra de controles
+        controles.add(buscarId);
+
+        // Área de busca por Título (Parte 18)
+        controles.add(new JLabel("Título:"));
+        controles.add(campoTitulo);
+        controles.add(buscarTitulo);
+
+        // Botões auxiliares
+        controles.add(limpar);
         controles.add(atualizar);
         controles.add(mostrarTodos);
 
         add(controles, BorderLayout.NORTH);
         add(status, BorderLayout.SOUTH);
 
-        // Eventos dos botões
+        // Eventos dos botões de busca
+        buscarId.addActionListener(e -> buscarLivro());
+        buscarTitulo.addActionListener(e -> buscarPorTitulo());
+
+        // Eventos para executar a busca ao pressionar a tecla Enter nos campos
+        campoId.addActionListener(e -> buscarLivro());
+        campoTitulo.addActionListener(e -> buscarPorTitulo());
+
+        // Eventos dos botões de listagem geral
         atualizar.addActionListener(e -> carregarLivros());
         mostrarTodos.addActionListener(e -> carregarLivros());
-        buscar.addActionListener(e -> buscarLivro());
 
-        // Desafio 2: Pressionar Enter no campoId executa a busca
-        campoId.addActionListener(e -> buscarLivro());
-
-        // Desafio 3: Evento do botão Limpar
+        // Evento do botão Limpar (Limpa ambos os campos de busca)
         limpar.addActionListener(e -> {
             campoId.setText("");
-            campoId.requestFocus();
+            campoTitulo.setText("");
+            campoTitulo.requestFocus();
         });
 
         carregarLivros();
@@ -80,7 +96,6 @@ public class TelaLivros extends JFrame {
             adicionarLinha(livro);
         }
 
-        // Desafio 1: Exibe a quantidade total de livros carregados
         status.setText("Livros apresentados: " + livros.size());
     }
 
@@ -135,6 +150,40 @@ public class TelaLivros extends JFrame {
         } else {
             adicionarLinha(livro);
             status.setText("Livro encontrado: " + livro.getTitulo());
+        }
+    }
+
+    // Método da Parte 18: Busca de livros utilizando o método LIKE do DAO
+    private void buscarPorTitulo() {
+        String titulo = campoTitulo.getText().trim();
+
+        if (titulo.isEmpty()) {
+            JOptionPane.showMessageDialog(
+                this,
+                "Informe o título do livro.",
+                "Campo obrigatório",
+                JOptionPane.WARNING_MESSAGE
+            );
+            return;
+        }
+
+        List<Livro> livros = dao.buscarLivrosPorTitulo(titulo);
+
+        modelo.setRowCount(0);
+
+        for (Livro livro : livros) {
+            adicionarLinha(livro);
+        }
+
+        status.setText("Livros encontrados: " + livros.size());
+
+        if (livros.isEmpty()) {
+            JOptionPane.showMessageDialog(
+                this,
+                "Nenhum livro encontrado.",
+                "Resultado da busca",
+                JOptionPane.INFORMATION_MESSAGE
+            );
         }
     }
 
