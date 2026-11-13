@@ -12,8 +12,8 @@ public class Livro {
     private String autor;
     private int ano;
     private boolean disponivel;
+    private String capa;
 
-    // Construtor original
     public Livro(String titulo, String autor, int ano) {
         this.titulo = titulo;
         this.autor = autor;
@@ -21,7 +21,6 @@ public class Livro {
         this.disponivel = true;
     }
 
-    // Construtor para registros do MariaDB (com ID)
     public Livro(int id, String titulo, String autor, int ano) {
         this.id = id;
         this.titulo = titulo;
@@ -30,7 +29,6 @@ public class Livro {
         this.disponivel = true;
     }
 
-    // Getters e Setters
     public int getId() {
         return id;
     }
@@ -49,6 +47,14 @@ public class Livro {
 
     public int getAno() {
         return ano;
+    }
+
+    public String getCapa() {
+        return capa;
+    }
+
+    public void setCapa(String capa) {
+        this.capa = capa;
     }
 
     public boolean estaDisponivel() {

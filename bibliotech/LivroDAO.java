@@ -2,27 +2,39 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
 public class LivroDAO {
 
     public boolean adicionarLivro(String titulo, String autor, int ano) {
+        return adicionarLivroRetornandoId(titulo, autor, ano) > 0;
+    }
+
+    public int adicionarLivroRetornandoId(String titulo, String autor, int ano) {
         String sql = "INSERT INTO livros (titulo, autor, ano) VALUES (?, ?, ?)";
 
         try (Connection conexao = Conexao.conectar();
-             PreparedStatement comando = conexao.prepareStatement(sql)) {
+             PreparedStatement comando = conexao.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
             comando.setString(1, titulo);
             comando.setString(2, autor);
             comando.setInt(3, ano);
 
             int linhas = comando.executeUpdate();
-            return linhas > 0;
+            if (linhas > 0) {
+                try (ResultSet chaves = comando.getGeneratedKeys()) {
+                    if (chaves.next()) {
+                        return chaves.getInt(1);
+                    }
+                }
+            }
+            return -1;
 
         } catch (SQLException e) {
             System.out.println("Erro ao adicionar livro: " + e.getMessage());
-            return false;
+            return -1;
         }
     }
 
@@ -37,11 +49,27 @@ public class LivroDAO {
             comando.setInt(3, ano);
             comando.setInt(4, id);
 
-            int linhas = comando.executeUpdate();
-            return linhas > 0;
+            return comando.executeUpdate() > 0;
 
         } catch (SQLException e) {
             System.out.println("Erro ao atualizar livro: " + e.getMessage());
+            return false;
+        }
+    }
+
+    public boolean atualizarCapa(int id, String caminho) {
+        String sql = "UPDATE livros SET capa = ? WHERE id = ?";
+
+        try (Connection conexao = Conexao.conectar();
+             PreparedStatement comando = conexao.prepareStatement(sql)) {
+
+            comando.setString(1, caminho);
+            comando.setInt(2, id);
+
+            return comando.executeUpdate() > 0;
+
+        } catch (SQLException e) {
+            System.out.println("Erro ao atualizar capa: " + e.getMessage());
             return false;
         }
     }
@@ -53,9 +81,7 @@ public class LivroDAO {
              PreparedStatement comando = conexao.prepareStatement(sql)) {
 
             comando.setInt(1, id);
-
-            int linhas = comando.executeUpdate();
-            return linhas > 0;
+            return comando.executeUpdate() > 0;
 
         } catch (SQLException e) {
             System.out.println("Erro ao excluir livro: " + e.getMessage());
@@ -63,24 +89,22 @@ public class LivroDAO {
         }
     }
 
-    // === MÉTODOS REVISADOS DA PARTE 15 ===
-
     public List<Livro> listarLivros() {
         List<Livro> livros = new ArrayList<>();
-
-        String sql = "SELECT id, titulo, autor, ano FROM livros ORDER BY titulo";
+        String sql = "SELECT id, titulo, autor, ano, capa FROM livros ORDER BY titulo";
 
         try (Connection conexao = Conexao.conectar();
              PreparedStatement comando = conexao.prepareStatement(sql);
              ResultSet resultado = comando.executeQuery()) {
 
             while (resultado.next()) {
-                int id = resultado.getInt("id");
-                String titulo = resultado.getString("titulo");
-                String autor = resultado.getString("autor");
-                int ano = resultado.getInt("ano");
-
-                Livro livro = new Livro(id, titulo, autor, ano);
+                Livro livro = new Livro(
+                    resultado.getInt("id"),
+                    resultado.getString("titulo"),
+                    resultado.getString("autor"),
+                    resultado.getInt("ano")
+                );
+                livro.setCapa(resultado.getString("capa"));
                 livros.add(livro);
             }
 
@@ -92,7 +116,7 @@ public class LivroDAO {
     }
 
     public Livro buscarLivroPorId(int id) {
-        String sql = "SELECT id, titulo, autor, ano FROM livros WHERE id = ?";
+        String sql = "SELECT id, titulo, autor, ano, capa FROM livros WHERE id = ?";
 
         try (Connection conexao = Conexao.conectar();
              PreparedStatement comando = conexao.prepareStatement(sql)) {
@@ -101,12 +125,14 @@ public class LivroDAO {
 
             try (ResultSet resultado = comando.executeQuery()) {
                 if (resultado.next()) {
-                    int codigo = resultado.getInt("id");
-                    String titulo = resultado.getString("titulo");
-                    String autor = resultado.getString("autor");
-                    int ano = resultado.getInt("ano");
-
-                    return new Livro(codigo, titulo, autor, ano);
+                    Livro livro = new Livro(
+                        resultado.getInt("id"),
+                        resultado.getString("titulo"),
+                        resultado.getString("autor"),
+                        resultado.getInt("ano")
+                    );
+                    livro.setCapa(resultado.getString("capa"));
+                    return livro;
                 }
             }
 
@@ -117,12 +143,9 @@ public class LivroDAO {
         return null;
     }
 
-    // === NOVO MÉTODO DA PARTE 18 ===
-
     public List<Livro> buscarLivrosPorTitulo(String titulo) {
         List<Livro> livros = new ArrayList<>();
-
-        String sql = "SELECT id, titulo, autor, ano FROM livros WHERE titulo LIKE ? ORDER BY titulo";
+        String sql = "SELECT id, titulo, autor, ano, capa FROM livros WHERE titulo LIKE ? ORDER BY titulo";
 
         try (Connection conexao = Conexao.conectar();
              PreparedStatement comando = conexao.prepareStatement(sql)) {
@@ -131,12 +154,13 @@ public class LivroDAO {
 
             try (ResultSet resultado = comando.executeQuery()) {
                 while (resultado.next()) {
-                    int id = resultado.getInt("id");
-                    String nomeTitulo = resultado.getString("titulo");
-                    String autor = resultado.getString("autor");
-                    int ano = resultado.getInt("ano");
-
-                    Livro livro = new Livro(id, nomeTitulo, autor, ano);
+                    Livro livro = new Livro(
+                        resultado.getInt("id"),
+                        resultado.getString("titulo"),
+                        resultado.getString("autor"),
+                        resultado.getInt("ano")
+                    );
+                    livro.setCapa(resultado.getString("capa"));
                     livros.add(livro);
                 }
             }
