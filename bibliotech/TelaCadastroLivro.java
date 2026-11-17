@@ -3,6 +3,7 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
 import java.awt.*;
 import java.io.File;
+import java.io.IOException;
 
 public class TelaCadastroLivro extends JDialog {
 
@@ -34,7 +35,6 @@ public class TelaCadastroLivro extends JDialog {
         painelRaiz.setBackground(COR_FUNDO);
         setContentPane(painelRaiz);
 
-        // Cabeçalho Azul Marinho
         JPanel topoAzul = new JPanel(new BorderLayout());
         topoAzul.setBackground(COR_AZUL_BANNER);
         topoAzul.setBorder(new EmptyBorder(16, 22, 16, 22));
@@ -45,7 +45,6 @@ public class TelaCadastroLivro extends JDialog {
         topoAzul.add(lblHeader, BorderLayout.WEST);
         painelRaiz.add(topoAzul, BorderLayout.NORTH);
 
-        // Centro
         JPanel painelCentro = new JPanel(new GridLayout(1, 2, 18, 0));
         painelCentro.setBackground(COR_FUNDO);
         painelCentro.setBorder(new EmptyBorder(5, 22, 5, 22));
@@ -88,7 +87,6 @@ public class TelaCadastroLivro extends JDialog {
         painelCentro.add(painelPrevia);
         painelRaiz.add(painelCentro, BorderLayout.CENTER);
 
-        // Rodapé
         JPanel painelRodape = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 12));
         painelRodape.setBackground(COR_FUNDO);
         painelRodape.setBorder(new EmptyBorder(0, 22, 8, 22));
@@ -154,10 +152,7 @@ public class TelaCadastroLivro extends JDialog {
             String autor = txtAutor.getText().trim();
             int ano = Integer.parseInt(txtAno.getText().trim());
 
-            if (titulo.isEmpty() || autor.isEmpty()) {
-                JOptionPane.showMessageDialog(this, "Preencha título e autor.");
-                return;
-            }
+            ValidadorLivro.validar(titulo, autor, ano);
 
             int idGerado = livroDAO.adicionarLivroRetornandoId(titulo, autor, ano);
 
@@ -167,12 +162,19 @@ public class TelaCadastroLivro extends JDialog {
             }
 
             JOptionPane.showMessageDialog(this, "Livro cadastrado com sucesso!");
-            telaPrincipal.carregarGrade(livroDAO.listarLivros());
+            telaPrincipal.listarTodosComTratamento();
             dispose();
+
         } catch (NumberFormatException ex) {
-            JOptionPane.showMessageDialog(this, "Digite um ano válido.");
-        } catch (Exception ex) {
-            JOptionPane.showMessageDialog(this, "Erro ao salvar: " + ex.getMessage());
+            JOptionPane.showMessageDialog(this, "O ano deve ser um número inteiro.");
+        } catch (LivroInvalidoException ex) {
+            JOptionPane.showMessageDialog(this, ex.getMessage());
+        } catch (PersistenciaException ex) {
+            JOptionPane.showMessageDialog(this, "Não foi possível salvar o livro no banco de dados.", "Erro de conexão", JOptionPane.ERROR_MESSAGE);
+            ex.printStackTrace();
+        } catch (IOException ex) {
+            JOptionPane.showMessageDialog(this, "Livro salvo, mas houve erro ao copiar a imagem da capa.", "Erro de imagem", JOptionPane.ERROR_MESSAGE);
+            ex.printStackTrace();
         }
     }
 }

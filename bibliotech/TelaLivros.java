@@ -6,6 +6,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Path2D;
 import java.io.File;
+import java.io.IOException;
 import java.util.List;
 
 public class TelaLivros extends JFrame {
@@ -19,7 +20,6 @@ public class TelaLivros extends JFrame {
 
     private LivroDAO livroDAO;
 
-    // Paleta inspirada no Catálogo Digital (Azul Marinho + Branco + Cinza Claro)
     private final Color COR_AZUL_BANNER = new Color(11, 43, 73);
     private final Color COR_AZUL_DETALHE = new Color(22, 68, 112);
     private final Color COR_FUNDO_GERAL = new Color(242, 244, 248);
@@ -42,7 +42,7 @@ public class TelaLivros extends JFrame {
         painelRaiz.setBorder(new EmptyBorder(10, 14, 12, 14));
         setContentPane(painelRaiz);
 
-        // ================= BANNER AZUL MARINHO COM CANTO ARREDONDADO =================
+        // ================= BANNER AZUL MARINHO =================
         JPanel bannerSuperior = new JPanel(new BorderLayout(15, 14)) {
             @Override
             protected void paintComponent(Graphics g) {
@@ -78,7 +78,6 @@ public class TelaLivros extends JFrame {
         bannerSuperior.setOpaque(false);
         bannerSuperior.setBorder(new EmptyBorder(24, 32, 24, 36));
 
-        // Textos do Banner
         JPanel painelTextosBanner = new JPanel();
         painelTextosBanner.setLayout(new BoxLayout(painelTextosBanner, BoxLayout.Y_AXIS));
         painelTextosBanner.setOpaque(false);
@@ -96,7 +95,6 @@ public class TelaLivros extends JFrame {
         painelTextosBanner.add(lblSubtitulo);
         bannerSuperior.add(painelTextosBanner, BorderLayout.NORTH);
 
-        // Barra de Busca Branca Arredondada + Filtros e Botões
         JPanel painelControlesBanner = new JPanel(new BorderLayout(15, 10));
         painelControlesBanner.setOpaque(false);
 
@@ -137,7 +135,6 @@ public class TelaLivros extends JFrame {
         linhaSuperiorBusca.setOpaque(false);
         linhaSuperiorBusca.add(barraPesquisaBranca);
 
-        // Linha inferior do banner (Busca rápida por ID + Ações + Meu Perfil)
         JPanel linhaInferiorBanner = new JPanel(new BorderLayout());
         linhaInferiorBanner.setOpaque(false);
 
@@ -181,7 +178,7 @@ public class TelaLivros extends JFrame {
 
         painelRaiz.add(bannerSuperior, BorderLayout.NORTH);
 
-        // ================= ÁREA BRANCA INFERIOR (GRADE DE LIVROS) =================
+        // ================= ÁREA BRANCA INFERIOR =================
         JPanel painelCorpo = new JPanel(new BorderLayout(0, 12)) {
             @Override
             protected void paintComponent(Graphics g) {
@@ -222,11 +219,11 @@ public class TelaLivros extends JFrame {
         btnBuscarId.addActionListener(e -> buscarPorId());
         txtId.addActionListener(e -> buscarPorId());
 
-        btnMostrarTodos.addActionListener(e -> carregarGrade(livroDAO.listarLivros()));
+        btnMostrarTodos.addActionListener(e -> listarTodosComTratamento());
         btnLimpar.addActionListener(e -> {
             txtId.setText("");
             txtTitulo.setText("");
-            carregarGrade(livroDAO.listarLivros());
+            listarTodosComTratamento();
         });
 
         btnMeuPerfil.addActionListener(e -> {
@@ -241,7 +238,7 @@ public class TelaLivros extends JFrame {
             telaCadastro.setVisible(true);
         });
 
-        carregarGrade(livroDAO.listarLivros());
+        listarTodosComTratamento();
     }
 
     private JButton criarBotao(String texto, Color cor) {
@@ -254,6 +251,22 @@ public class TelaLivros extends JFrame {
         btn.setCursor(new Cursor(Cursor.HAND_CURSOR));
         btn.setBorder(new EmptyBorder(7, 14, 7, 14));
         return btn;
+    }
+
+    public void listarTodosComTratamento() {
+        try {
+            carregarGrade(livroDAO.listarLivros());
+        } catch (PersistenciaException ex) {
+            lblTotal.setText("Erro ao consultar o banco.");
+            System.err.println(ex.getMessage());
+            ex.printStackTrace();
+            JOptionPane.showMessageDialog(
+                this,
+                "Não foi possível carregar os livros. Verifique a conexão com o MariaDB.",
+                "Erro de conexão",
+                JOptionPane.ERROR_MESSAGE
+            );
+        }
     }
 
     public void carregarTabela(List<Livro> livros) {
@@ -353,6 +366,11 @@ public class TelaLivros extends JFrame {
     private void buscarPorId() {
         try {
             int id = Integer.parseInt(txtId.getText().trim());
+
+            if (id <= 0) {
+                throw new IllegalArgumentException("O ID deve ser positivo.");
+            }
+
             Livro l = livroDAO.buscarLivroPorId(id);
             if (l != null) {
                 carregarGrade(List.of(l));
@@ -360,13 +378,35 @@ public class TelaLivros extends JFrame {
                 JOptionPane.showMessageDialog(this, "Nenhum livro encontrado com o ID " + id);
             }
         } catch (NumberFormatException ex) {
-            JOptionPane.showMessageDialog(this, "Digite um número de ID válido.");
+            JOptionPane.showMessageDialog(this, "Informe um número inteiro válido.");
+        } catch (IllegalArgumentException ex) {
+            JOptionPane.showMessageDialog(this, ex.getMessage());
+        } catch (PersistenciaException ex) {
+            lblTotal.setText("Erro ao consultar o banco.");
+            ex.printStackTrace();
+            JOptionPane.showMessageDialog(
+                this,
+                "Não foi possível buscar o livro. Verifique a conexão com o MariaDB.",
+                "Erro de conexão",
+                JOptionPane.ERROR_MESSAGE
+            );
         }
     }
 
     private void buscarPorTitulo() {
-        String termo = txtTitulo.getText().trim();
-        carregarGrade(livroDAO.buscarLivrosPorTitulo(termo));
+        try {
+            String termo = txtTitulo.getText().trim();
+            carregarGrade(livroDAO.buscarLivrosPorTitulo(termo));
+        } catch (PersistenciaException ex) {
+            lblTotal.setText("Erro ao consultar o banco.");
+            ex.printStackTrace();
+            JOptionPane.showMessageDialog(
+                this,
+                "Não foi possível pesquisar os livros. Verifique a conexão com o MariaDB.",
+                "Erro de conexão",
+                JOptionPane.ERROR_MESSAGE
+            );
+        }
     }
 
     private void selecionarCapaParaLivro() {
@@ -385,9 +425,13 @@ public class TelaLivros extends JFrame {
                 String novoCaminho = ImagemLivro.salvar(arquivoOrigem.toPath(), livroSelecionado.getId());
                 livroDAO.atualizarCapa(livroSelecionado.getId(), novoCaminho);
                 JOptionPane.showMessageDialog(this, "Capa salva com sucesso!");
-                carregarGrade(livroDAO.listarLivros());
-            } catch (Exception ex) {
-                JOptionPane.showMessageDialog(this, "Erro ao salvar capa: " + ex.getMessage());
+                listarTodosComTratamento();
+            } catch (IOException ex) {
+                JOptionPane.showMessageDialog(this, "Não foi possível salvar a imagem.", "Erro", JOptionPane.ERROR_MESSAGE);
+                ex.printStackTrace();
+            } catch (PersistenciaException ex) {
+                JOptionPane.showMessageDialog(this, "Não foi possível atualizar a capa no banco de dados.", "Erro de conexão", JOptionPane.ERROR_MESSAGE);
+                ex.printStackTrace();
             }
         }
     }
@@ -395,4 +439,4 @@ public class TelaLivros extends JFrame {
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> new TelaLivros().setVisible(true));
     }
-}
+}   
